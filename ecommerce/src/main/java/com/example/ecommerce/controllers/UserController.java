@@ -1,5 +1,7 @@
 package com.example.ecommerce.controllers;
 
+import com.example.ecommerce.dto.user.SignInDto;
+import com.example.ecommerce.dto.user.SignInResponseDto;
 import com.example.ecommerce.dto.user.SignUpResponseDto;
 import com.example.ecommerce.dto.user.SignupDto;
 import com.example.ecommerce.exceptions.CustomException;
@@ -19,5 +21,9 @@ public class UserController {
     @PostMapping("/signup")
     public SignUpResponseDto Signup(@RequestBody SignupDto signupDto) throws CustomException {
         return userService.signUp(signupDto);
+    }
+    @PostMapping("/signIn")
+    public SignInResponseDto Signup(@RequestBody SignInDto signInDto) throws CustomException {
+        return userService.signIn(signInDto);
     }
 }
