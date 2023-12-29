@@ -3,6 +3,7 @@ package com.example.ecommerce.service;
 import com.example.ecommerce.dto.user.SignUpResponseDto;
 import com.example.ecommerce.dto.user.SignupDto;
 import com.example.ecommerce.exceptions.CustomException;
+import com.example.ecommerce.model.AuthenticationToken;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.UserRepository;
 import org.slf4j.Logger;
@@ -22,6 +23,9 @@ public class UserService {
     UserRepository userRepository;
 
     Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    @Autowired
+    AuthenticationService authenticationService;
 
     public SignUpResponseDto signUp(SignupDto signupDto) throws CustomException {
         // Check to see if the current email address has already been registered.
@@ -43,6 +47,10 @@ public class UserService {
             // save the User
             userRepository.save(user);
             // success in creating
+            // generate token for user
+            final AuthenticationToken authenticationToken = new AuthenticationToken(user);
+            // save token in database
+            authenticationService.saveConfirmationToken(authenticationToken);
             return new SignUpResponseDto("success", "User created successfully");
         } catch (Exception e) {
             // handle signup error
