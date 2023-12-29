@@ -4,6 +4,7 @@ import com.example.ecommerce.dto.user.SignInDto;
 import com.example.ecommerce.dto.user.SignInResponseDto;
 import com.example.ecommerce.dto.user.SignUpResponseDto;
 import com.example.ecommerce.dto.user.SignupDto;
+import com.example.ecommerce.exceptions.AuthenticationFailException;
 import com.example.ecommerce.exceptions.CustomException;
 import com.example.ecommerce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class UserController {
         return userService.signUp(signupDto);
     }
     @PostMapping("/signIn")
-    public SignInResponseDto Signup(@RequestBody SignInDto signInDto) throws CustomException {
+    public SignInResponseDto Signup(@RequestBody SignInDto signInDto) throws CustomException, AuthenticationFailException {
         return userService.signIn(signInDto);
     }
 }
