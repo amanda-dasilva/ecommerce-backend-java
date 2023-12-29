@@ -1,1 +1,1 @@
-# ecommerce-vue-java
+# ecommerce-backend-java
