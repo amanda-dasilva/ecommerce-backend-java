@@ -13,101 +13,69 @@ import com.example.ecommerce.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
 
 @Service
 public class UserService {
-    @Autowired
-    UserRepository userRepository;
-
     Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final UserRepository userRepository;
+    private final AuthenticationService authenticationService;
 
     @Autowired
-    AuthenticationService authenticationService;
+    public UserService(UserRepository userRepository, AuthenticationService authenticationService) {
+        this.userRepository = userRepository;
+        this.authenticationService = authenticationService;
+    }
 
     public SignUpResponseDto signUp(SignupDto signupDto) throws CustomException {
-        // Check to see if the current email address has already been registered.
-        if (Objects.nonNull(userRepository.findByEmail(signupDto.getEmail()))) {
-            // If the email address has been registered then throw an exception.
-            throw new CustomException("User already exists");
-        }
-        // first encrypt the password
-        String encryptedPassword = signupDto.getPassword();
-        try {
-            encryptedPassword = hashPassword(signupDto.getPassword());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            logger.error("Hashing password failed {}", e.getMessage());
+        // Check if the current email address has already been registered.
+        if (userRepository.findByEmail(signupDto.getEmail()) != null) {
+            throw new CustomException(MessageStrings.USER_ALREADY_EXISTS);
         }
 
-        User user = new User(signupDto.getFirstName(), signupDto.getLastName(), signupDto.getEmail(), encryptedPassword );
+        // Encrypt the password using BCrypt
+        String hashedPassword = BCrypt.hashpw(signupDto.getPassword(), BCrypt.gensalt());
+
+        User user = new User(signupDto.getFirstName(), signupDto.getLastName(),
+                signupDto.getEmail(), hashedPassword);
+
         try {
-            // save the User
+            // Save the User and generate token
             userRepository.save(user);
-            // success in creating
-            // generate token for user
-            final AuthenticationToken authenticationToken = new AuthenticationToken(user);
-            // save token in database
+            AuthenticationToken authenticationToken = new AuthenticationToken(user);
             authenticationService.saveConfirmationToken(authenticationToken);
             return new SignUpResponseDto("success", "User created successfully");
         } catch (Exception e) {
-            // handle signup error
+            // Handle signup error
             throw new CustomException(e.getMessage());
         }
     }
-    // Method to hash a password using the SHA-256 algorithm
-    public static String hashPassword(String password) throws NoSuchAlgorithmException {
-        // Get an instance of the SHA-256 message digest
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        // Update the digest with the bytes of the password using UTF-8 encoding
-        byte[] digest = md.digest(password.getBytes(StandardCharsets.UTF_8));
-        // Convert the byte array to a hexadecimal string
-        return bytesToHex(digest);
-    }
-    // Method to convert a byte array to a hexadecimal string
-    private static String bytesToHex(byte[] bytes) {
-        // Use a StringBuilder to efficiently build the hexadecimal string
-        StringBuilder hexStringBuilder = new StringBuilder(2 * bytes.length);
-        // Iterate over each byte in the array
-        for (byte b : bytes) {
-            // Convert each byte to a two-digit hexadecimal representation and append to the StringBuilder
-            hexStringBuilder.append(String.format("%02X", b));
-        }
-        // Return the final hexadecimal string
-        return hexStringBuilder.toString();
-    }
 
     public SignInResponseDto signIn(SignInDto signInDto) throws AuthenticationFailException, CustomException {
-        // first find User by email
+        // Find User by email
         User user = userRepository.findByEmail(signInDto.getEmail());
-        if(!Objects.nonNull(user)){
-            throw new AuthenticationFailException("user not present");
+
+        if (user == null) {
+            throw new AuthenticationFailException(MessageStrings.USER_NOT_PRESENT);
         }
+
         try {
-            // check if password is right
-            if (!user.getPassword().equals(hashPassword(signInDto.getPassword()))){
-                // passwords do not match
-                throw  new AuthenticationFailException(MessageStrings.WRONG_PASSWORD);
+            // Check if password is correct using BCrypt
+            if (!BCrypt.checkpw(signInDto.getPassword(), user.getPassword())) {
+                throw new AuthenticationFailException(MessageStrings.WRONG_PASSWORD);
             }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            logger.error("hashing password failed {}", e.getMessage());
+        } catch (Exception e) {
+            logger.error("Hashing password failed", e);
             throw new CustomException(e.getMessage());
         }
 
         AuthenticationToken token = authenticationService.getToken(user);
 
-        if(!Objects.nonNull(token)) {
-            // token not present
+        if (token == null) {
             throw new CustomException(MessageStrings.AUTH_TOKEN_NOT_PRESENT);
         }
 
-        return new SignInResponseDto ("success", token.getToken());
+        return new SignInResponseDto("success", token.getToken());
     }
 }

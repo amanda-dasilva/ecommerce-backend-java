@@ -7,42 +7,44 @@ import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
 @Service
 public class AuthenticationService {
-    @Autowired
-    TokenRepository repository;
+    private final TokenRepository repository;
 
-    // save the confirmation token
+    @Autowired
+    public AuthenticationService(TokenRepository repository) {
+        this.repository = repository;
+    }
+
+    // Save the confirmation token
+    @Transactional
     public void saveConfirmationToken(AuthenticationToken authenticationToken) {
         repository.save(authenticationToken);
     }
 
-    // get token of the User
+    // Retrieve token for the User
     public AuthenticationToken getToken(User user) {
         return repository.findTokenByUser(user);
     }
 
-    // get User from the token
+    // Retrieve User from the token
     public User getUser(String token) {
         AuthenticationToken authenticationToken = repository.findTokenByToken(token);
-        if (Objects.nonNull(authenticationToken)) {
-            if (Objects.nonNull(authenticationToken.getUser())) {
-                return authenticationToken.getUser();
-            }
-        }
-        return null;
+        return (authenticationToken != null) ? authenticationToken.getUser() : null;
     }
 
-    // check if the token is valid
+    // Check if the token is valid
     public void authenticate(String token) throws AuthenticationFailException {
-        if (!Objects.nonNull(token)) {
+        if (token == null) {
             throw new AuthenticationFailException(MessageStrings.AUTH_TOKEN_NOT_PRESENT);
         }
-        if (!Objects.nonNull(getUser(token))) {
-            throw new AuthenticationFailException(MessageStrings.AUTH_TOKEN_NOT_VALID);
+
+        if (getUser(token) == null) {
+            throw new AuthenticationFailException(MessageStrings.AUTH_TOKEN_NOT_VALID + ": " + token);
         }
     }
 }
