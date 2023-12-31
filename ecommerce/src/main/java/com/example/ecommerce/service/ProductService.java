@@ -4,6 +4,7 @@ import com.example.ecommerce.dto.product.ProductDto;
 import com.example.ecommerce.model.Category;
 import com.example.ecommerce.model.Product;
 import com.example.ecommerce.repository.ProductRepository;
+import com.example.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,12 @@ import java.util.List;
 
 @Service
 public class ProductService {
+
+    private final ProductRepository productRepository;
     @Autowired
-    private ProductRepository productRepository;
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     public static Product getProductFromDto(ProductDto productDto, Category category) {
         Product product = new Product();
