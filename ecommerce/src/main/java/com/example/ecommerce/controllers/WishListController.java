@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@RequestMapping("/wishlist")
 public class WishListController {
     private final WishListService wishListService;
     private final AuthenticationService authenticationService;
