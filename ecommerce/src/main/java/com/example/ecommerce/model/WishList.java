@@ -26,6 +26,7 @@ public class WishList {
     public WishList(User user, Product product) {
         this.user = user;
         this.product = product;
+        this.createdDate = new Date();
     }
 
     public Integer getId() {
