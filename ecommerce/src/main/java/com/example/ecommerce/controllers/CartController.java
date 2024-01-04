@@ -4,6 +4,7 @@ import com.example.ecommerce.common.ApiResponse;
 import com.example.ecommerce.dto.cart.AddToCartDto;
 import com.example.ecommerce.dto.cart.CartDto;
 import com.example.ecommerce.exceptions.AuthenticationFailException;
+import com.example.ecommerce.exceptions.CartItemNotExistException;
 import com.example.ecommerce.exceptions.ProductNotExistException;
 import com.example.ecommerce.model.Product;
 import com.example.ecommerce.model.User;
@@ -62,5 +63,14 @@ public class CartController {
         CartDto cartDto = cartService.listCartItems(user);
 
         return new ResponseEntity<CartDto>(cartDto,HttpStatus.OK);
+    }
+    @DeleteMapping("/delete/{cartItemId}")
+    public ResponseEntity<ApiResponse> deleteCartItem(@PathVariable("cartItemId") int cartItemId,
+                                                      @RequestParam("token") String token)
+            throws AuthenticationFailException, CartItemNotExistException {
+        authenticationService.authenticate(token);
+        User user = authenticationService.getUser(token);
+        cartService.deleteCartItem(cartItemId, user);
+        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "Item has been removed"), HttpStatus.OK);
     }
 }

@@ -3,6 +3,7 @@ package com.example.ecommerce.service;
 import com.example.ecommerce.dto.cart.AddToCartDto;
 import com.example.ecommerce.dto.cart.CartDto;
 import com.example.ecommerce.dto.cart.CartItemDto;
+import com.example.ecommerce.exceptions.CartItemNotExistException;
 import com.example.ecommerce.model.Cart;
 import com.example.ecommerce.model.Product;
 import com.example.ecommerce.model.User;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CartService {
@@ -44,5 +46,22 @@ public class CartService {
 
         // return cart DTO
         return new CartDto(cartItems,totalCost);
+    }
+    public void deleteCartItem(int cartItemId, User user) throws CartItemNotExistException {
+        // first check if cartItemId is valid else throw an CartItemNotExistException
+        Optional<Cart> optionalCart = cartRepository.findById(cartItemId);
+
+        if (!optionalCart.isPresent()) {
+            throw new CartItemNotExistException("cartItemId not valid");
+        }
+
+        // next check if the cartItem belongs to the user else throw CartItemNotExistException exception
+        Cart cart = optionalCart.get();
+        if (cart.getUser() != user) {
+            throw new CartItemNotExistException("cart item does not belong to user");
+        }
+
+        // delete the cart item
+        cartRepository.deleteById(cartItemId);
     }
 }
