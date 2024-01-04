@@ -2,6 +2,7 @@ package com.example.ecommerce.controllers;
 
 import com.example.ecommerce.common.ApiResponse;
 import com.example.ecommerce.dto.cart.AddToCartDto;
+import com.example.ecommerce.dto.cart.CartDto;
 import com.example.ecommerce.exceptions.AuthenticationFailException;
 import com.example.ecommerce.exceptions.ProductNotExistException;
 import com.example.ecommerce.model.Product;
@@ -48,5 +49,18 @@ public class CartController {
         // return response
         return new ResponseEntity<>(new ApiResponse(true, "Added to cart"), HttpStatus.CREATED);
 
+    }
+    @GetMapping("/")
+    public ResponseEntity<CartDto> getCartItems(@RequestParam("token") String token) throws AuthenticationFailException {
+        // first authenticate the token
+        authenticationService.authenticate(token);
+
+        // get the user
+        User user = authenticationService.getUser(token);
+
+        // get items in the cart for the user.
+        CartDto cartDto = cartService.listCartItems(user);
+
+        return new ResponseEntity<CartDto>(cartDto,HttpStatus.OK);
     }
 }
