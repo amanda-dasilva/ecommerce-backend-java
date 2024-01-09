@@ -35,9 +35,6 @@ public class WishListController {
     /*
     API to add a new product in wishlist
     */
-    /*
-    API to add a new product in wishlist
-     */
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addWishList(@RequestBody ProductDto productDto,
                                                    @RequestParam("token") String token) throws AuthenticationFailException {
@@ -47,13 +44,19 @@ public class WishListController {
         User user = authenticationService.getUser(token);
 
         // get the product from product repo
-        Product product = productRepository.getById(productDto.getId());
+        Product product = productRepository.getReferenceById(productDto.getId());
+
+        // check if the product is already in the user's wishlist
+        if (wishListService.isProductInWishlist(user, product)) {
+            return new ResponseEntity<>(new ApiResponse(false, "Product already in wishlist"),
+                    HttpStatus.BAD_REQUEST);
+        }
 
         // save wish list
         WishList wishList = new WishList(user, product);
         wishListService.createWishlist(wishList);
 
-        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "Added to wishlist"),
+        return new ResponseEntity<>(new ApiResponse(true, "Added to wishlist"),
                 HttpStatus.CREATED);
     }
     @GetMapping("/{token}")

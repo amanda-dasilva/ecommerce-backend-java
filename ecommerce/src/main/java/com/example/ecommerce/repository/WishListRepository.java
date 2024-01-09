@@ -1,5 +1,6 @@
 package com.example.ecommerce.repository;
 
+import com.example.ecommerce.model.Product;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.model.WishList;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,5 @@ public interface WishListRepository extends JpaRepository<WishList, Integer> {
     // sort by latest created date
     List<WishList> findAllByUserOrderByCreatedDateDesc(User user);
 
+    boolean existsByUserAndProduct(User user, Product product);
 }

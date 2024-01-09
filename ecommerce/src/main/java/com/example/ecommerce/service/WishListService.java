@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.model.Product;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.model.WishList;
 import com.example.ecommerce.repository.WishListRepository;
@@ -24,5 +25,10 @@ public class WishListService {
 
     public List<WishList> readWishList(User user) {
         return wishListRepository.findAllByUserOrderByCreatedDateDesc(user);
+    }
+
+    public boolean isProductInWishlist(User user, Product product) {
+        // Check if the product is already in the user's wishlist
+        return wishListRepository.existsByUserAndProduct(user, product);
     }
 }
