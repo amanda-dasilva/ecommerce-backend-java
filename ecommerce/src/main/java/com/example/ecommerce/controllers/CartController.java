@@ -36,7 +36,7 @@ public class CartController {
     }
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addToCart(@RequestBody AddToCartDto addToCartDto, @RequestParam("token") String token)
-            throws AuthenticationFailException, ProductNotExistException, AuthenticationFailException {
+            throws ProductNotExistException, AuthenticationFailException {
         // first authenticate the token
         authenticationService.authenticate(token);
 
@@ -62,7 +62,7 @@ public class CartController {
         // get items in the cart for the user.
         CartDto cartDto = cartService.listCartItems(user);
 
-        return new ResponseEntity<CartDto>(cartDto,HttpStatus.OK);
+        return new ResponseEntity<>(cartDto, HttpStatus.OK);
     }
     @DeleteMapping("/delete/{cartItemId}")
     public ResponseEntity<ApiResponse> deleteCartItem(@PathVariable("cartItemId") int cartItemId,
@@ -71,6 +71,6 @@ public class CartController {
         authenticationService.authenticate(token);
         User user = authenticationService.getUser(token);
         cartService.deleteCartItem(cartItemId, user);
-        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "Item has been removed"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(true, "Item has been removed"), HttpStatus.OK);
     }
 }
