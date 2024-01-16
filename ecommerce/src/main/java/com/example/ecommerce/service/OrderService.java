@@ -1,6 +1,12 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.dto.cart.CartDto;
+import com.example.ecommerce.dto.cart.CartItemDto;
 import com.example.ecommerce.dto.checkout.CheckoutItemDto;
+import com.example.ecommerce.model.Order;
+import com.example.ecommerce.model.OrderItem;
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.OrderItemsRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -11,13 +17,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
 @Transactional
 public class OrderService {
 
-    private CartService cartService;
+    private final CartService cartService;
+    private final OrderItemsRepository orderItemsRepository;
 
     @Value("${BASE_URL}")
     private String baseURL;
@@ -25,8 +33,9 @@ public class OrderService {
     @Value("${STRIPE_SECRET_KEY}")
     private String apiKey;
     @Autowired
-    public OrderService(CartService cartService){
+    public OrderService(CartService cartService, OrderItemsRepository orderItemsRepository){
         this.cartService = cartService;
+        this.orderItemsRepository = orderItemsRepository;
     }
     // create total price and send productname as input
     SessionCreateParams.LineItem.PriceData createPriceData(CheckoutItemDto checkoutItemDto) {
@@ -76,5 +85,31 @@ public class OrderService {
                 .setSuccessUrl(successURL)
                 .build();
         return Session.create(params);
+    }
+    public void placeOrder(User user, String sessionId) {
+        // first let get cart items for the user
+        CartDto cartDto = cartService.listCartItems(user);
+
+        List<CartItemDto> cartItemDtoList = cartDto.getCartItems();
+
+        // create the order and save it
+        Order newOrder = new Order();
+        newOrder.setCreatedDate(new Date());
+        newOrder.setSessionId(sessionId);
+        newOrder.setUser(user);
+        newOrder.setTotalPrice(cartDto.getTotalCost());
+        orderRepository.save(newOrder);
+
+        for (CartItemDto cartItemDto : cartItemDtoList) {
+            // create orderItem and save each one
+            OrderItem orderItem = new OrderItem();
+            orderItem.setCreatedDate(new Date());
+            orderItem.setPrice(cartItemDto.getProduct().getPrice());
+            orderItem.setProduct(cartItemDto.getProduct());
+            orderItem.setQuantity(cartItemDto.getQuantity());
+            orderItem.setOrder(newOrder);
+            // add to order item list
+            orderItemsRepository.save(orderItem);
+        }
     }
 }
