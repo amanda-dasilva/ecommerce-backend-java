@@ -4,6 +4,7 @@ import com.example.ecommerce.common.ApiResponse;
 import com.example.ecommerce.dto.checkout.CheckoutItemDto;
 import com.example.ecommerce.dto.checkout.StripeResponse;
 import com.example.ecommerce.exceptions.AuthenticationFailException;
+import com.example.ecommerce.model.Order;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.service.AuthenticationService;
 import com.example.ecommerce.service.OrderService;
@@ -47,5 +48,16 @@ public class OrderController {
         // place the order
         orderService.placeOrder(user, sessionId);
         return new ResponseEntity<>(new ApiResponse(true, "Order has been placed"), HttpStatus.CREATED);
+    }
+    @GetMapping("/")
+    public ResponseEntity<List<Order>> getAllOrders(@RequestParam("token") String token) throws AuthenticationFailException {
+        // validate token
+        authenticationService.authenticate(token);
+        // retrieve user
+        User user = authenticationService.getUser(token);
+        // get orders
+        List<Order> orderDtoList = orderService.listOrders(user);
+
+        return new ResponseEntity<>(orderDtoList, HttpStatus.OK);
     }
 }

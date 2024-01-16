@@ -117,4 +117,7 @@ public class OrderService {
         //
         cartService.deleteUserCartItems(user);
     }
+    public List<Order> listOrders(User user) {
+        return orderRepository.findAllByUserOrderByCreatedDateDesc(user);
+    }
 }
