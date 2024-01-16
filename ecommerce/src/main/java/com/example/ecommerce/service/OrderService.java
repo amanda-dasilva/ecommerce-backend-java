@@ -7,6 +7,7 @@ import com.example.ecommerce.model.Order;
 import com.example.ecommerce.model.OrderItem;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.OrderItemsRepository;
+import com.example.ecommerce.repository.OrderRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -26,6 +27,7 @@ public class OrderService {
 
     private final CartService cartService;
     private final OrderItemsRepository orderItemsRepository;
+    private final OrderRepository orderRepository;
 
     @Value("${BASE_URL}")
     private String baseURL;
@@ -33,9 +35,10 @@ public class OrderService {
     @Value("${STRIPE_SECRET_KEY}")
     private String apiKey;
     @Autowired
-    public OrderService(CartService cartService, OrderItemsRepository orderItemsRepository){
+    public OrderService(CartService cartService, OrderItemsRepository orderItemsRepository, OrderRepository orderRepository){
         this.cartService = cartService;
         this.orderItemsRepository = orderItemsRepository;
+        this.orderRepository = orderRepository;
     }
     // create total price and send productname as input
     SessionCreateParams.LineItem.PriceData createPriceData(CheckoutItemDto checkoutItemDto) {
