@@ -114,5 +114,7 @@ public class OrderService {
             // add to order item list
             orderItemsRepository.save(orderItem);
         }
+        //
+        cartService.deleteUserCartItems(user);
     }
 }

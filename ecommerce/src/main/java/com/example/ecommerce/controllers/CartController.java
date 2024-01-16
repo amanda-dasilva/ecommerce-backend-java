@@ -65,7 +65,7 @@ public class CartController {
         return new ResponseEntity<>(cartDto, HttpStatus.OK);
     }
     @DeleteMapping("/delete/{cartItemId}")
-    public ResponseEntity<ApiResponse> deleteCartItem(@PathVariable("cartItemId") int cartItemId,
+    public ResponseEntity<ApiResponse> deleteCartItem(@PathVariable("cartItemId") Integer cartItemId,
                                                       @RequestParam("token") String token)
             throws AuthenticationFailException, CartItemNotExistException {
         authenticationService.authenticate(token);

@@ -47,11 +47,11 @@ public class CartService {
         // return cart DTO
         return new CartDto(cartItems,totalCost);
     }
-    public void deleteCartItem(int cartItemId, User user) throws CartItemNotExistException {
+    public void deleteCartItem(Integer cartItemId, User user) throws CartItemNotExistException {
         // first check if cartItemId is valid else throw an CartItemNotExistException
         Optional<Cart> optionalCart = cartRepository.findById(cartItemId);
 
-        if (!optionalCart.isPresent()) {
+        if (optionalCart.isEmpty()) {
             throw new CartItemNotExistException("cartItemId not valid");
         }
 
@@ -63,5 +63,9 @@ public class CartService {
 
         // delete the cart item
         cartRepository.deleteById(cartItemId);
+    }
+
+    public void deleteUserCartItems(User user) {
+        cartRepository.deleteByUser(user);
     }
 }
