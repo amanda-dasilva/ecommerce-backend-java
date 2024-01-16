@@ -18,8 +18,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/product")
 public class ProductController {
-    ProductService productService;
-    CategoryService categoryService;
+    private final ProductService productService;
+    private final CategoryService categoryService;
 
     @Autowired
     public ProductController(ProductService productService, CategoryService categoryService){
@@ -50,8 +50,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable("productID") Integer productID,
                                                      @RequestBody @Valid ProductDto productDto) {
         Optional<Category> optionalCategory = categoryService.readCategory(productDto.getCategoryId());
-        if (!optionalCategory.isPresent()) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse(false, "category is invalid"),
+        if (optionalCategory.isEmpty()) {
+            return new ResponseEntity<>(new ApiResponse(false, "category is invalid"),
                     HttpStatus.CONFLICT);
         }
         Category category = optionalCategory.get();

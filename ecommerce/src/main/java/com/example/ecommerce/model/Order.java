@@ -23,11 +23,12 @@ public class Order {
     private String sessionId;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<OrderItem> orderItems;
 
-    @ManyToOne()
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "user_id")
     @JsonIgnore
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     public Order() {

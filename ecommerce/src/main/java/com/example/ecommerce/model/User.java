@@ -1,6 +1,9 @@
 package com.example.ecommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -20,6 +23,7 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
 
     public User() {
 

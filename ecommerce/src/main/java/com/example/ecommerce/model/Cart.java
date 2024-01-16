@@ -1,5 +1,6 @@
 package com.example.ecommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -13,10 +14,12 @@ public class Cart {
     @Column(name = "created_date")
     private Date createdDate;
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(nullable = false, name = "product_id")
+    @JsonIgnore
     private Product product;
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(nullable = false, name = "user_id")
+    @JsonIgnore
     private User user;
     private Integer quantity;
     public Cart() {

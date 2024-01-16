@@ -3,6 +3,9 @@ package com.example.ecommerce.service;
 import com.example.ecommerce.dto.cart.CartDto;
 import com.example.ecommerce.dto.cart.CartItemDto;
 import com.example.ecommerce.dto.checkout.CheckoutItemDto;
+import com.example.ecommerce.exceptions.CartItemNotExistException;
+import com.example.ecommerce.exceptions.OrderNotFoundException;
+import com.example.ecommerce.model.Cart;
 import com.example.ecommerce.model.Order;
 import com.example.ecommerce.model.OrderItem;
 import com.example.ecommerce.model.User;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -118,6 +122,24 @@ public class OrderService {
         cartService.deleteUserCartItems(user);
     }
     public List<Order> listOrders(User user) {
+
         return orderRepository.findAllByUserOrderByCreatedDateDesc(user);
+    }
+
+    // find the order by id, validate if the order belong to user and return
+    public Order getOrder(Integer orderId, User user) throws OrderNotFoundException {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+
+        if (optionalOrder.isEmpty()) {
+            throw new OrderNotFoundException("orderId not valid");
+        }
+
+        // next check if the orderId belongs to the user else throw OrderNotFoundException exception
+        Order order = optionalOrder.get();
+        if (order.getUser() != user) {
+            throw new OrderNotFoundException("order item does not belong to user");
+        }
+        // return the order
+        return order;
     }
 }

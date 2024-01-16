@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Service
 public class CartService {
-    CartRepository cartRepository;
+    private final CartRepository cartRepository;
     @Autowired
     public CartService(CartRepository cartRepository){
         this.cartRepository = cartRepository;

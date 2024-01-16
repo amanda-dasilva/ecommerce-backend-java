@@ -15,8 +15,11 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/category")
 public class CategoryController {
+    private final CategoryService categoryService;
     @Autowired
-    private CategoryService categoryService;
+    public CategoryController(CategoryService categoryService){
+        this.categoryService = categoryService;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createCategory(@Valid @RequestBody Category category){
@@ -39,7 +42,7 @@ public class CategoryController {
         if (Objects.nonNull(categoryService.readCategory(categoryID))) {
             // If the category exists then update it.
             categoryService.updateCategory(categoryID, category);
-            return new ResponseEntity<ApiResponse>(new ApiResponse(true, "updated the category"), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(true, "updated the category"), HttpStatus.OK);
         }
         // If the category doesn't exist then return a response of unsuccessful.
         return new ResponseEntity<>(new ApiResponse(false, "category does not exist"), HttpStatus.NOT_FOUND);

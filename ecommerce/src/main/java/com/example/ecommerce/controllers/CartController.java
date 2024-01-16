@@ -20,16 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/cart")
 public class CartController {
-    CategoryService categoryService;
-    ProductService productService;
-    AuthenticationService authenticationService;
-
-    CartService cartService;
+    private final ProductService productService;
+    private final AuthenticationService authenticationService;
+    private final CartService cartService;
 
     @Autowired
-    public CartController(CategoryService categoryService, ProductService productService,
+    public CartController(ProductService productService,
                           AuthenticationService authenticationService, CartService cartService){
-        this.categoryService = categoryService;
         this.productService = productService;
         this.authenticationService = authenticationService;
         this.cartService = cartService;

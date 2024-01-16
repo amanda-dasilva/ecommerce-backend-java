@@ -1,5 +1,6 @@
 package com.example.ecommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -22,11 +23,13 @@ public class OrderItem {
     private Date createdDate;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @JoinColumn(nullable = false, name = "order_id")
+    @JsonIgnore
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    @JoinColumn(nullable = false, name = "product_id")
+    @JsonIgnore
     private Product product;
 
     public OrderItem() {
