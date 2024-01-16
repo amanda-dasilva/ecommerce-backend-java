@@ -18,11 +18,11 @@ public class Cart {
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
-    private int quantity;
+    private Integer quantity;
     public Cart() {
 
     }
-    public Cart(Product product, User user, int quantity) {
+    public Cart(Product product, User user, Integer quantity) {
         this.product = product;
         this.user = user;
         this.createdDate = new Date();
@@ -65,7 +65,7 @@ public class Cart {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 }

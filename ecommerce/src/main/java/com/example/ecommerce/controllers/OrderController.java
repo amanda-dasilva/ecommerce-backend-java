@@ -5,6 +5,7 @@ import com.example.ecommerce.dto.checkout.StripeResponse;
 import com.example.ecommerce.service.OrderService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
 
-    private OrderService orderService;
+    private final OrderService orderService;
 
     @Autowired
     public OrderController(OrderService orderService){
