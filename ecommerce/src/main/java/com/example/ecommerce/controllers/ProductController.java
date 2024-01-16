@@ -18,12 +18,14 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/product")
 public class ProductController {
-
-    @Autowired
     ProductService productService;
+    CategoryService categoryService;
 
     @Autowired
-    CategoryService categoryService;
+    public ProductController(ProductService productService, CategoryService categoryService){
+        this.productService = productService;
+        this.categoryService = categoryService;
+    }
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addProduct(@Valid @RequestBody ProductDto productDto) {

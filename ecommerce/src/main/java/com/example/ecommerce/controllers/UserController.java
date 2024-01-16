@@ -16,15 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("user")
 @RestController
 public class UserController {
-    @Autowired
     UserService userService;
+
+    @Autowired
+    public UserController(UserService userService){
+        this.userService = userService;
+    }
 
     @PostMapping("/signup")
     public SignUpResponseDto Signup(@RequestBody SignupDto signupDto) throws CustomException {
         return userService.signUp(signupDto);
     }
     @PostMapping("/signIn")
-    public SignInResponseDto Signup(@RequestBody SignInDto signInDto) throws CustomException, AuthenticationFailException {
+    public SignInResponseDto Signin(@RequestBody SignInDto signInDto) throws CustomException, AuthenticationFailException {
         return userService.signIn(signInDto);
     }
 }
